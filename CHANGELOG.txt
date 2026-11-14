@@ -4,6 +4,10 @@ TSDUCK CHANGE LOG AND RELEASE NOTES
 
 VERSION 3.46-4947 (November 2026)
 
+[NEW] New commands and plugins:
+
+  * Added plugin "ttml": Extract DVB-TTML subtitles (ETSI EN 303 560).
+
 [INC] Incompatibilities with previous versions:
 
   * For security reasons, running piped commands from a tuner emulator XML file

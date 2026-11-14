@@ -1,0 +1,135 @@
+//----------------------------------------------------------------------------
+//
+// TSDuck - The MPEG Transport Stream Toolkit
+// Copyright (c) 2005-2026, Thierry Lelegard
+// BSD-2-Clause license, see LICENSE.txt file or https://tsduck.io/license
+//
+//----------------------------------------------------------------------------
+
+<<<
+=== ttml
+
+[.cmd-header]
+Extract DVB-TTML subtitles
+
+This plugin extracts DVB-TTML subtitles, as defined in ETSI EN 303 560.
+A DVB-TTML PID is signalled in the PMT by a _TTML_subtitling_descriptor_.
+
+Each PES packet in a DVB-TTML PID carries a _segment_mediatime_, one or more segments and a CRC.
+A TTML segment holds one complete TTML document, uncompressed or gzip-compressed.
+The PTS of the PES packet corresponds to the _segment_mediatime_ on the timeline of the document.
+
+The plugin prints one line per PES packet: its PTS, its _segment_mediatime_,
+the difference between the two, and the type and size of each segment.
+A PES packet with an invalid CRC is reported with a warning.
+The TTML documents can be saved in a directory.
+
+The times in a TTML document are media times, on the timeline of the document.
+To get the PTS of a time in a document, add the difference between the PTS and the _segment_mediatime_ of its PES packet.
+
+A stream usually repeats each document in several PES packets, so that a receiver can start at any time.
+Each repetition is saved in its own file and counts towards `--max-documents`, unless `--no-duplicate` is specified.
+
+[.usage]
+Usage
+
+[source,shell]
+----
+$ tsp -P ttml [options]
+----
+
+[.usage]
+Options
+
+[.opt]
+*-l* _name_ +
+*--language* _name_
+
+[.optdoc]
+Select the DVB-TTML PIDs whose _TTML_subtitling_descriptor_ has this language.
+
+[.optdoc]
+By default, all DVB-TTML PIDs of the service are selected.
+
+[.opt]
+*-m* _value_ +
+*--max-documents* _value_
+
+[.optdoc]
+Stop after extracting this number of TTML documents, across all selected PIDs.
+
+[.optdoc]
+By default, all documents are extracted.
+
+[.opt]
+*--no-duplicate*
+
+[.optdoc]
+Do not report a PES packet whose data field is identical to the previous one in the same PID.
+A DVB-TTML stream usually repeats each document in several PES packets.
+
+[.optdoc]
+With this option, a repeated document is not listed, not saved, and does not count towards `--max-documents`.
+
+[.opt]
+*-d* _path_ +
+*--output-directory* _path_
+
+[.optdoc]
+Save each TTML document in a file in this directory.
+The file name is `ttml-<pid>-<index>.xml`, or `.xml.gz` for a gzip-compressed segment.
+
+[.optdoc]
+By default, the documents are not saved.
+
+[.opt]
+*-o* _filename_ +
+*--output-file* _filename_
+
+[.optdoc]
+Write the description of each PES packet to this text file.
+By default, it goes to the standard output.
+
+[.opt]
+*-p* _pid1[-pid2]_ +
+*--pid* _pid1[-pid2]_
+
+[.optdoc]
+Extract DVB-TTML from these PIDs.
+Several `--pid` options may be specified.
+
+[.optdoc]
+By default, the PIDs come from the _TTML_subtitling_descriptors_ in the PMT of the service.
+
+[.opt]
+*-s* _value_ +
+*--service* _value_
+
+[.optdoc]
+Specify the service with DVB-TTML subtitles.
+include::{docdir}/opt/optdoc-service.adoc[tags=!*]
+
+[.optdoc]
+If neither `--service` nor `--pid` is specified, the first service in the PAT is used.
+
+[.usage]
+Examples
+
+List the DVB-TTML PES packets of the first service in a captured TS file:
+
+[source,shell]
+----
+$ tsp -I file capture.ts -P ttml -O drop
+----
+
+Without `-O drop`, `tsp` writes the transport stream to the standard output, mixed with the list of PES packets.
+
+Save the German subtitle documents in the directory `subtitles`:
+
+[source,shell]
+----
+$ tsp -I file capture.ts -P ttml --language deu -d subtitles -O drop
+----
+
+include::{docdir}/opt/group-duck-context.adoc[tags=!*;charset]
+include::{docdir}/opt/group-common-plugins.adoc[tags=!*]

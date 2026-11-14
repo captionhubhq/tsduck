@@ -417,6 +417,10 @@ endif::[]
 |packet
 |Rename a transport stream (modify ts id, etc.)
 
+|ttml
+|packet
+|Extract DVB-TTML subtitles
+
 |until
 |packet
 |Pass TS packets until specified conditions
